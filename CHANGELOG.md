@@ -1,4 +1,4 @@
-# 2.0.0-beta.1 - 2025-01-XX
+# 2.0.0-beta.1 - 2025-06-22
 
 * **BREAKING CHANGE**: Updated to use `maxminddb-golang/v2` which provides
   significant performance improvements and a more modern API.
