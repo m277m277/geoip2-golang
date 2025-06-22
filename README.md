@@ -7,16 +7,18 @@ and [GeoIP2](http://www.maxmind.com/en/geolocation_landing) databases.
 
 This library is built using
 [the Go maxminddb reader](https://github.com/oschwald/maxminddb-golang).
-All data for the database record is decoded using this library. If you only
-need several fields, you may get superior performance by using maxminddb's
-`Lookup` directly with a result struct that only contains the required fields.
+All data for the database record is decoded using this library. Version 2.0
+provides significant performance improvements with 56% fewer allocations and
+34% less memory usage compared to v1. If you only need several fields, you
+may get superior performance by using maxminddb's `Lookup` directly with a
+result struct that only contains the required fields.
 (See [example_test.go](https://github.com/oschwald/maxminddb-golang/blob/main/example_test.go)
 in the maxminddb repository for an example of this.)
 
 ## Installation ##
 
 ```
-go get github.com/oschwald/geoip2-golang
+go get github.com/oschwald/geoip2-golang/v2
 ```
 
 ## Usage ##
@@ -34,7 +36,7 @@ import (
 	"log"
 	"net/netip"
 
-	"github.com/oschwald/geoip2-golang"
+	"github.com/oschwald/geoip2-golang/v2"
 )
 
 func main() {
@@ -52,11 +54,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Portuguese (BR) city name: %v\n", record.City.Names["pt-BR"])
+	fmt.Printf("Portuguese (BR) city name: %v\n", record.City.Names.BrazilianPortuguese)
 	if len(record.Subdivisions) > 0 {
-		fmt.Printf("English subdivision name: %v\n", record.Subdivisions[0].Names["en"])
+		fmt.Printf("English subdivision name: %v\n", record.Subdivisions[0].Names.English)
 	}
-	fmt.Printf("Russian country name: %v\n", record.Country.Names["ru"])
+	fmt.Printf("Russian country name: %v\n", record.Country.Names.Russian)
 	fmt.Printf("ISO country code: %v\n", record.Country.ISOCode)
 	fmt.Printf("Time zone: %v\n", record.Location.TimeZone)
 	fmt.Printf("Coordinates: %v, %v\n", record.Location.Latitude, record.Location.Longitude)

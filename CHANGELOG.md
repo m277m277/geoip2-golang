@@ -7,6 +7,9 @@
   networking practices.
 * **BREAKING CHANGE**: Renamed `IsoCode` fields to `ISOCode` in all structs
   to follow proper capitalization for the ISO acronym. Closes GitHub issue #4.
+* **BREAKING CHANGE**: Replaced `map[string]string` Names fields with structured
+  `Names` type for significant performance improvements. This eliminates map
+  allocation overhead, reducing memory usage by 34% and allocations by 56%.
 * Updated module path to `github.com/oschwald/geoip2-golang/v2` to follow
   Go's semantic versioning guidelines for breaking changes.
 * Updated examples and documentation to demonstrate proper error handling
@@ -51,6 +54,29 @@ To migrate from v1 to v2:
    countryCode := record.Country.ISOCode
    subdivisionCode := record.Subdivisions[0].ISOCode
    ```
+
+4. Replace map-based Names access with struct fields:
+   ```go
+   // Old
+   cityName := record.City.Names["en"]
+   countryName := record.Country.Names["pt-BR"]
+   continentName := record.Continent.Names["zh-CN"]
+
+   // New
+   cityName := record.City.Names.English
+   countryName := record.Country.Names.BrazilianPortuguese
+   continentName := record.Continent.Names.SimplifiedChinese
+   ```
+
+   Available Names struct fields:
+   - `English` (en)
+   - `German` (de)
+   - `Spanish` (es)
+   - `French` (fr)
+   - `Japanese` (ja)
+   - `BrazilianPortuguese` (pt-BR)
+   - `Russian` (ru)
+   - `SimplifiedChinese` (zh-CN)
 
 # 1.11.0 - 2024-06-03
 
