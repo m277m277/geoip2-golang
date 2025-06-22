@@ -195,22 +195,12 @@ type Enterprise struct {
 		StaticIPScore float64 `json:"static_ip_score" maxminddb:"static_ip_score"`
 		// AutonomousSystemNumber is the autonomous system number associated with the IP address
 		AutonomousSystemNumber uint `json:"autonomous_system_number" maxminddb:"autonomous_system_number"`
-		// IsAnonymousProxy is true if the IP is an anonymous proxy.
-		//
-		// Deprecated: Use the GeoIP2 Anonymous IP database instead.
-		IsAnonymousProxy bool `json:"is_anonymous_proxy" maxminddb:"is_anonymous_proxy"`
 		// IsAnycast is true if the IP address belongs to an anycast network.
 		// See https://en.wikipedia.org/wiki/Anycast
 		IsAnycast bool `json:"is_anycast" maxminddb:"is_anycast"`
 		// IsLegitimateProxy is true if MaxMind believes this IP address to be a legitimate proxy,
 		// such as an internal VPN used by a corporation
 		IsLegitimateProxy bool `json:"is_legitimate_proxy" maxminddb:"is_legitimate_proxy"`
-		// IsSatelliteProvider is true if the IP address is from a satellite
-		// provider that provides service to multiple countries.
-		//
-		// Deprecated: Due to increased coverage by mobile carriers, very few
-		// satellite providers now serve multiple countries.
-		IsSatelliteProvider bool `json:"is_satellite_provider" maxminddb:"is_satellite_provider"`
 	} `json:"traits"              maxminddb:"traits"`
 	// Location contains data for the location record associated with the IP address
 	Location struct {
@@ -363,19 +353,9 @@ type City struct {
 	Traits struct {
 		// IPAddress is the IP address used during the lookup
 		IPAddress netip.Addr `json:"ip_address"`
-		// IsAnonymousProxy is true if the IP is an anonymous proxy.
-		//
-		// Deprecated: Use the GeoIP2 Anonymous IP database instead.
-		IsAnonymousProxy bool `json:"is_anonymous_proxy" maxminddb:"is_anonymous_proxy"`
 		// IsAnycast is true if the IP address belongs to an anycast network.
 		// See https://en.wikipedia.org/wiki/Anycast
 		IsAnycast bool `json:"is_anycast" maxminddb:"is_anycast"`
-		// IsSatelliteProvider is true if the IP address is from a satellite
-		// provider that provides service to multiple countries.
-		//
-		// Deprecated: Due to increased coverage by mobile carriers, very few
-		// satellite providers now serve multiple countries.
-		IsSatelliteProvider bool `json:"is_satellite_provider" maxminddb:"is_satellite_provider"`
 		// Network is the network prefix for this record. This is the largest
 		// network where all
 		// of the fields besides IPAddress have the same value.
@@ -461,19 +441,9 @@ type Country struct {
 	Traits struct {
 		// IPAddress is the IP address used during the lookup
 		IPAddress netip.Addr `json:"ip_address"`
-		// IsAnonymousProxy is true if the IP is an anonymous proxy.
-		//
-		// Deprecated: Use the GeoIP2 Anonymous IP database instead.
-		IsAnonymousProxy bool `json:"is_anonymous_proxy" maxminddb:"is_anonymous_proxy"`
 		// IsAnycast is true if the IP address belongs to an anycast network.
 		// See https://en.wikipedia.org/wiki/Anycast
 		IsAnycast bool `json:"is_anycast" maxminddb:"is_anycast"`
-		// IsSatelliteProvider is true if the IP address is from a satellite
-		// provider that provides service to multiple countries.
-		//
-		// Deprecated: Due to increased coverage by mobile carriers, very few
-		// satellite providers now serve multiple countries.
-		IsSatelliteProvider bool `json:"is_satellite_provider" maxminddb:"is_satellite_provider"`
 		// Network is the network prefix for this record. This is the largest
 		// network where all
 		// of the fields besides IPAddress have the same value.

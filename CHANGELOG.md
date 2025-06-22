@@ -13,6 +13,9 @@
 * **BREAKING CHANGE**: Added JSON tags to all struct fields. JSON tags match
   the corresponding `maxminddb` tags where they exist. Custom fields (`IPAddress`
   and `Network`) use snake_case (`ip_address` and `network`).
+* **BREAKING CHANGE**: Removed `IsAnonymousProxy` and `IsSatelliteProvider` fields
+  from all Traits structs. These fields have been removed from MaxMind databases.
+  Use the dedicated Anonymous IP database for anonymity detection instead.
 * Added `IsZero()` method to all result structs (City, Country, Enterprise, ASN,
   etc.) to easily check whether any data was found for the queried IP address.
   Requested by Salim Alami. GitHub [#32](https://github.com/oschwald/geoip2-golang/issues/32).
