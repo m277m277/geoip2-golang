@@ -54,6 +54,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if record.IsZero() {
+		fmt.Println("No data found for this IP")
+		return
+	}
 	fmt.Printf("Portuguese (BR) city name: %v\n", record.City.Names.BrazilianPortuguese)
 	if len(record.Subdivisions) > 0 {
 		fmt.Printf("English subdivision name: %v\n", record.Subdivisions[0].Names.English)

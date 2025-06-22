@@ -10,6 +10,9 @@
 * **BREAKING CHANGE**: Replaced `map[string]string` Names fields with structured
   `Names` type for significant performance improvements. This eliminates map
   allocation overhead, reducing memory usage by 34% and allocations by 56%.
+* Added `IsZero()` method to all result structs (City, Country, Enterprise, ASN,
+  etc.) to easily check whether any data was found for the queried IP address.
+  Requested by Salim Alami. GitHub [#32](https://github.com/oschwald/geoip2-golang/issues/32).
 * Updated module path to `github.com/oschwald/geoip2-golang/v2` to follow
   Go's semantic versioning guidelines for breaking changes.
 * Updated examples and documentation to demonstrate proper error handling
@@ -77,6 +80,19 @@ To migrate from v1 to v2:
    - `BrazilianPortuguese` (pt-BR)
    - `Russian` (ru)
    - `SimplifiedChinese` (zh-CN)
+
+5. Check if data was found using the new `IsZero()` method:
+   ```go
+   record, err := db.City(ip)
+   if err != nil {
+       // handle error
+   }
+   if record.IsZero() {
+       fmt.Println("No data found for this IP")
+   } else {
+       fmt.Printf("City: %s\n", record.City.Names.English)
+   }
+   ```
 
 # 1.11.0 - 2024-06-03
 

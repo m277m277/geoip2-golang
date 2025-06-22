@@ -308,3 +308,59 @@ func randomIPv4Address(r *rand.Rand, ip net.IP) {
 	ip[2] = byte(num >> 8)
 	ip[3] = byte(num)
 }
+
+func TestIsZero(t *testing.T) {
+	reader, err := Open("test-data/test-data/GeoIP2-City-Test.mmdb")
+	require.NoError(t, err)
+	defer reader.Close()
+
+	// Test with an IP that has data
+	ipWithData := netip.MustParseAddr("81.2.69.160")
+	record, err := reader.City(ipWithData)
+	require.NoError(t, err)
+	assert.False(t, record.IsZero(), "Record with data should not be zero")
+
+	// Test with an IP that has no data (private IP)
+	ipWithoutData := netip.MustParseAddr("192.168.1.1")
+	emptyRecord, err := reader.City(ipWithoutData)
+	require.NoError(t, err)
+	assert.True(t, emptyRecord.IsZero(), "Record without data should be zero")
+
+	// Test Names IsZero
+	var emptyNames Names
+	assert.True(t, emptyNames.IsZero(), "Empty Names should be zero")
+
+	nonEmptyNames := Names{English: "Test"}
+	assert.False(t, nonEmptyNames.IsZero(), "Names with data should not be zero")
+
+	// Test other struct types
+	var emptyASN ASN
+	assert.True(t, emptyASN.IsZero(), "Empty ASN should be zero")
+
+	nonEmptyASN := ASN{AutonomousSystemNumber: 123}
+	assert.False(t, nonEmptyASN.IsZero(), "ASN with data should not be zero")
+}
+
+func TestAllStructsHaveIsZero(t *testing.T) {
+	// Ensure all result structs have IsZero methods
+	var city City
+	var country Country
+	var enterprise Enterprise
+	var anonymousIP AnonymousIP
+	var asn ASN
+	var connectionType ConnectionType
+	var domain Domain
+	var isp ISP
+	var names Names
+
+	// These should all compile and return true for zero values
+	assert.True(t, city.IsZero())
+	assert.True(t, country.IsZero())
+	assert.True(t, enterprise.IsZero())
+	assert.True(t, anonymousIP.IsZero())
+	assert.True(t, asn.IsZero())
+	assert.True(t, connectionType.IsZero())
+	assert.True(t, domain.IsZero())
+	assert.True(t, isp.IsZero())
+	assert.True(t, names.IsZero())
+}

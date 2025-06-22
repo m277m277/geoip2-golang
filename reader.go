@@ -10,6 +10,7 @@ package geoip2
 import (
 	"fmt"
 	"net/netip"
+	"reflect"
 
 	"github.com/oschwald/maxminddb-golang/v2"
 )
@@ -26,6 +27,13 @@ type Names struct {
 	BrazilianPortuguese string `maxminddb:"pt-BR"` // Portuguese (Brazil)
 	Russian             string `maxminddb:"ru"`    // Russian
 	SimplifiedChinese   string `maxminddb:"zh-CN"` // Chinese (Simplified)
+}
+
+var zeroNames Names
+
+// IsZero returns true if the Names struct has no localized names.
+func (n Names) IsZero() bool {
+	return n == zeroNames
 }
 
 // The Enterprise struct corresponds to the data in the GeoIP2 Enterprise
@@ -97,6 +105,13 @@ type Enterprise struct {
 	} `maxminddb:"location"`
 }
 
+var zeroEnterprise Enterprise
+
+// IsZero returns true if no data was found for the IP in the Enterprise database.
+func (e Enterprise) IsZero() bool {
+	return reflect.DeepEqual(e, zeroEnterprise)
+}
+
 // The City struct corresponds to the data in the GeoIP2/GeoLite2 City
 // databases.
 type City struct {
@@ -150,6 +165,13 @@ type City struct {
 	} `maxminddb:"traits"`
 }
 
+var zeroCity City
+
+// IsZero returns true if no data was found for the IP in the City database.
+func (c City) IsZero() bool {
+	return reflect.DeepEqual(c, zeroCity)
+}
+
 // The Country struct corresponds to the data in the GeoIP2/GeoLite2
 // Country databases.
 type Country struct {
@@ -184,6 +206,13 @@ type Country struct {
 	} `maxminddb:"traits"`
 }
 
+var zeroCountry Country
+
+// IsZero returns true if no data was found for the IP in the Country database.
+func (c Country) IsZero() bool {
+	return c == zeroCountry
+}
+
 // The AnonymousIP struct corresponds to the data in the GeoIP2
 // Anonymous IP database.
 type AnonymousIP struct {
@@ -195,10 +224,24 @@ type AnonymousIP struct {
 	IsTorExitNode      bool `maxminddb:"is_tor_exit_node"`
 }
 
+var zeroAnonymousIP AnonymousIP
+
+// IsZero returns true if no data was found for the IP in the AnonymousIP database.
+func (a AnonymousIP) IsZero() bool {
+	return a == zeroAnonymousIP
+}
+
 // The ASN struct corresponds to the data in the GeoLite2 ASN database.
 type ASN struct {
 	AutonomousSystemOrganization string `maxminddb:"autonomous_system_organization"`
 	AutonomousSystemNumber       uint   `maxminddb:"autonomous_system_number"`
+}
+
+var zeroASN ASN
+
+// IsZero returns true if no data was found for the IP in the ASN database.
+func (a ASN) IsZero() bool {
+	return a == zeroASN
 }
 
 // The ConnectionType struct corresponds to the data in the GeoIP2
@@ -207,9 +250,23 @@ type ConnectionType struct {
 	ConnectionType string `maxminddb:"connection_type"`
 }
 
+var zeroConnectionType ConnectionType
+
+// IsZero returns true if no data was found for the IP in the ConnectionType database.
+func (c ConnectionType) IsZero() bool {
+	return c == zeroConnectionType
+}
+
 // The Domain struct corresponds to the data in the GeoIP2 Domain database.
 type Domain struct {
 	Domain string `maxminddb:"domain"`
+}
+
+var zeroDomain Domain
+
+// IsZero returns true if no data was found for the IP in the Domain database.
+func (d Domain) IsZero() bool {
+	return d == zeroDomain
 }
 
 // The ISP struct corresponds to the data in the GeoIP2 ISP database.
@@ -220,6 +277,13 @@ type ISP struct {
 	MobileNetworkCode            string `maxminddb:"mobile_network_code"`
 	Organization                 string `maxminddb:"organization"`
 	AutonomousSystemNumber       uint   `maxminddb:"autonomous_system_number"`
+}
+
+var zeroISP ISP
+
+// IsZero returns true if no data was found for the IP in the ISP database.
+func (i ISP) IsZero() bool {
+	return i == zeroISP
 }
 
 type databaseType int
