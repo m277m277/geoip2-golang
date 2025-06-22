@@ -13,6 +13,14 @@
 * Added `IsZero()` method to all result structs (City, Country, Enterprise, ASN,
   etc.) to easily check whether any data was found for the queried IP address.
   Requested by Salim Alami. GitHub [#32](https://github.com/oschwald/geoip2-golang/issues/32).
+* Added `Network` and `IPAddress` fields to all result structs. The `Network` field
+  exposes the network prefix from the MaxMind database lookup, and the `IPAddress` field
+  contains the IP address used during the lookup. These fields are only populated when
+  data is found for the IP address. For flat record types (ASN, ConnectionType, Domain,
+  ISP, AnonymousIP), the fields are named `Network` and `IPAddress`. For complex types
+  (City, Country, Enterprise), the fields are located at `.Traits.Network` and
+  `.Traits.IPAddress`.
+  Requested by Aaron Bishop. GitHub [#128](https://github.com/oschwald/geoip2-golang/issues/128).
 * Updated module path to `github.com/oschwald/geoip2-golang/v2` to follow
   Go's semantic versioning guidelines for breaking changes.
 * Updated examples and documentation to demonstrate proper error handling

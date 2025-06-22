@@ -16,7 +16,8 @@ func TestReader(t *testing.T) {
 
 	defer reader.Close()
 
-	record, err := reader.City(netip.MustParseAddr("81.2.69.160"))
+	testAddr := netip.MustParseAddr("81.2.69.160")
+	record, err := reader.City(testAddr)
 	require.NoError(t, err)
 
 	m := reader.Metadata()
@@ -108,6 +109,11 @@ func TestReader(t *testing.T) {
 	assert.Equal(t, expectedRegisteredCountryNames, record.RegisteredCountry.Names)
 
 	assert.False(t, record.RepresentedCountry.IsInEuropeanUnion)
+
+	// Test Network and IPAddress fields
+	assert.Equal(t, testAddr, record.Traits.IPAddress)
+	assert.True(t, record.Traits.Network.IsValid())
+	assert.True(t, record.Traits.Network.Contains(testAddr))
 }
 
 func TestIsAnycast(t *testing.T) {
@@ -141,7 +147,8 @@ func TestAnonymousIP(t *testing.T) {
 	require.NoError(t, err)
 	defer reader.Close()
 
-	record, err := reader.AnonymousIP(netip.MustParseAddr("1.2.0.0"))
+	testAddr := netip.MustParseAddr("1.2.0.0")
+	record, err := reader.AnonymousIP(testAddr)
 	require.NoError(t, err)
 
 	assert.True(t, record.IsAnonymous)
@@ -151,6 +158,11 @@ func TestAnonymousIP(t *testing.T) {
 	assert.False(t, record.IsPublicProxy)
 	assert.False(t, record.IsTorExitNode)
 	assert.False(t, record.IsResidentialProxy)
+
+	// Test Network and IPAddress fields
+	assert.Equal(t, testAddr, record.IPAddress)
+	assert.True(t, record.Network.IsValid())
+	assert.True(t, record.Network.Contains(testAddr))
 }
 
 func TestASN(t *testing.T) {
@@ -158,12 +170,18 @@ func TestASN(t *testing.T) {
 	require.NoError(t, err)
 	defer reader.Close()
 
-	record, err := reader.ASN(netip.MustParseAddr("1.128.0.0"))
+	testAddr := netip.MustParseAddr("1.128.0.0")
+	record, err := reader.ASN(testAddr)
 	require.NoError(t, err)
 
 	assert.Equal(t, uint(1221), record.AutonomousSystemNumber)
 
 	assert.Equal(t, "Telstra Pty Ltd", record.AutonomousSystemOrganization)
+
+	// Test Network and IPAddress fields
+	assert.Equal(t, testAddr, record.IPAddress)
+	assert.True(t, record.Network.IsValid())
+	assert.True(t, record.Network.Contains(testAddr))
 }
 
 func TestConnectionType(t *testing.T) {
@@ -208,7 +226,8 @@ func TestEnterprise(t *testing.T) {
 
 	defer reader.Close()
 
-	record, err := reader.Enterprise(netip.MustParseAddr("74.209.24.0"))
+	testAddr1 := netip.MustParseAddr("74.209.24.0")
+	record, err := reader.Enterprise(testAddr1)
 	require.NoError(t, err)
 
 	assert.Equal(t, uint8(11), record.City.Confidence)
@@ -219,7 +238,8 @@ func TestEnterprise(t *testing.T) {
 	assert.Equal(t, "frpt.net", record.Traits.Domain)
 	assert.InEpsilon(t, float64(0.34), record.Traits.StaticIPScore, 1e-10)
 
-	record, err = reader.Enterprise(netip.MustParseAddr("149.101.100.0"))
+	testAddr2 := netip.MustParseAddr("149.101.100.0")
+	record, err = reader.Enterprise(testAddr2)
 	require.NoError(t, err)
 
 	assert.Equal(t, uint(6167), record.Traits.AutonomousSystemNumber)
@@ -228,6 +248,11 @@ func TestEnterprise(t *testing.T) {
 	assert.Equal(t, "Verizon Wireless", record.Traits.ISP)
 	assert.Equal(t, "310", record.Traits.MobileCountryCode)
 	assert.Equal(t, "004", record.Traits.MobileNetworkCode)
+
+	// Test Network and IPAddress fields (for the second lookup)
+	assert.Equal(t, testAddr2, record.Traits.IPAddress)
+	assert.True(t, record.Traits.Network.IsValid())
+	assert.True(t, record.Traits.Network.Contains(testAddr2))
 }
 
 func TestISP(t *testing.T) {

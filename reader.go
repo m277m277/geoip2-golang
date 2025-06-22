@@ -81,20 +81,22 @@ type Enterprise struct {
 		IsInEuropeanUnion bool   `maxminddb:"is_in_european_union"`
 	} `maxminddb:"registered_country"`
 	Traits struct {
-		AutonomousSystemOrganization string  `maxminddb:"autonomous_system_organization"`
-		ConnectionType               string  `maxminddb:"connection_type"`
-		Domain                       string  `maxminddb:"domain"`
-		ISP                          string  `maxminddb:"isp"`
-		MobileCountryCode            string  `maxminddb:"mobile_country_code"`
-		MobileNetworkCode            string  `maxminddb:"mobile_network_code"`
-		Organization                 string  `maxminddb:"organization"`
-		UserType                     string  `maxminddb:"user_type"`
-		AutonomousSystemNumber       uint    `maxminddb:"autonomous_system_number"`
-		StaticIPScore                float64 `maxminddb:"static_ip_score"`
-		IsAnonymousProxy             bool    `maxminddb:"is_anonymous_proxy"`
-		IsAnycast                    bool    `maxminddb:"is_anycast"`
-		IsLegitimateProxy            bool    `maxminddb:"is_legitimate_proxy"`
-		IsSatelliteProvider          bool    `maxminddb:"is_satellite_provider"`
+		Network                      netip.Prefix  // The network prefix for this record
+		IPAddress                    netip.Addr    // The IP address used during the lookup
+		AutonomousSystemOrganization string        `maxminddb:"autonomous_system_organization"`
+		ConnectionType               string        `maxminddb:"connection_type"`
+		Domain                       string        `maxminddb:"domain"`
+		ISP                          string        `maxminddb:"isp"`
+		MobileCountryCode            string        `maxminddb:"mobile_country_code"`
+		MobileNetworkCode            string        `maxminddb:"mobile_network_code"`
+		Organization                 string        `maxminddb:"organization"`
+		UserType                     string        `maxminddb:"user_type"`
+		StaticIPScore                float64       `maxminddb:"static_ip_score"`
+		AutonomousSystemNumber       uint          `maxminddb:"autonomous_system_number"`
+		IsAnonymousProxy             bool          `maxminddb:"is_anonymous_proxy"`
+		IsAnycast                    bool          `maxminddb:"is_anycast"`
+		IsLegitimateProxy            bool          `maxminddb:"is_legitimate_proxy"`
+		IsSatelliteProvider          bool          `maxminddb:"is_satellite_provider"`
 	} `maxminddb:"traits"`
 	Location struct {
 		TimeZone       string  `maxminddb:"time_zone"`
@@ -159,9 +161,11 @@ type City struct {
 		AccuracyRadius uint16  `maxminddb:"accuracy_radius"`
 	} `maxminddb:"location"`
 	Traits struct {
-		IsAnonymousProxy    bool `maxminddb:"is_anonymous_proxy"`
-		IsAnycast           bool `maxminddb:"is_anycast"`
-		IsSatelliteProvider bool `maxminddb:"is_satellite_provider"`
+		IPAddress           netip.Addr    // The IP address used during the lookup
+		IsAnonymousProxy    bool          `maxminddb:"is_anonymous_proxy"`
+		IsAnycast           bool          `maxminddb:"is_anycast"`
+		IsSatelliteProvider bool          `maxminddb:"is_satellite_provider"`
+		Network             netip.Prefix  // The network prefix for this record
 	} `maxminddb:"traits"`
 }
 
@@ -200,9 +204,11 @@ type Country struct {
 		IsInEuropeanUnion bool   `maxminddb:"is_in_european_union"`
 	} `maxminddb:"represented_country"`
 	Traits struct {
-		IsAnonymousProxy    bool `maxminddb:"is_anonymous_proxy"`
-		IsAnycast           bool `maxminddb:"is_anycast"`
-		IsSatelliteProvider bool `maxminddb:"is_satellite_provider"`
+		IPAddress           netip.Addr    // The IP address used during the lookup
+		IsAnonymousProxy    bool          `maxminddb:"is_anonymous_proxy"`
+		IsAnycast           bool          `maxminddb:"is_anycast"`
+		IsSatelliteProvider bool          `maxminddb:"is_satellite_provider"`
+		Network             netip.Prefix  // The network prefix for this record
 	} `maxminddb:"traits"`
 }
 
@@ -216,12 +222,14 @@ func (c Country) IsZero() bool {
 // The AnonymousIP struct corresponds to the data in the GeoIP2
 // Anonymous IP database.
 type AnonymousIP struct {
-	IsAnonymous        bool `maxminddb:"is_anonymous"`
-	IsAnonymousVPN     bool `maxminddb:"is_anonymous_vpn"`
-	IsHostingProvider  bool `maxminddb:"is_hosting_provider"`
-	IsPublicProxy      bool `maxminddb:"is_public_proxy"`
-	IsResidentialProxy bool `maxminddb:"is_residential_proxy"`
-	IsTorExitNode      bool `maxminddb:"is_tor_exit_node"`
+	IPAddress          netip.Addr    // The IP address used during the lookup
+	IsAnonymous        bool          `maxminddb:"is_anonymous"`
+	IsAnonymousVPN     bool          `maxminddb:"is_anonymous_vpn"`
+	IsHostingProvider  bool          `maxminddb:"is_hosting_provider"`
+	IsPublicProxy      bool          `maxminddb:"is_public_proxy"`
+	IsResidentialProxy bool          `maxminddb:"is_residential_proxy"`
+	IsTorExitNode      bool          `maxminddb:"is_tor_exit_node"`
+	Network            netip.Prefix  // The network prefix for this record
 }
 
 var zeroAnonymousIP AnonymousIP
@@ -233,8 +241,10 @@ func (a AnonymousIP) IsZero() bool {
 
 // The ASN struct corresponds to the data in the GeoLite2 ASN database.
 type ASN struct {
-	AutonomousSystemOrganization string `maxminddb:"autonomous_system_organization"`
-	AutonomousSystemNumber       uint   `maxminddb:"autonomous_system_number"`
+	AutonomousSystemNumber       uint          `maxminddb:"autonomous_system_number"`
+	AutonomousSystemOrganization string        `maxminddb:"autonomous_system_organization"`
+	IPAddress                    netip.Addr    // The IP address used during the lookup
+	Network                      netip.Prefix  // The network prefix for this record
 }
 
 var zeroASN ASN
@@ -247,7 +257,9 @@ func (a ASN) IsZero() bool {
 // The ConnectionType struct corresponds to the data in the GeoIP2
 // Connection-Type database.
 type ConnectionType struct {
-	ConnectionType string `maxminddb:"connection_type"`
+	ConnectionType string        `maxminddb:"connection_type"`
+	IPAddress      netip.Addr    // The IP address used during the lookup
+	Network        netip.Prefix  // The network prefix for this record
 }
 
 var zeroConnectionType ConnectionType
@@ -259,7 +271,9 @@ func (c ConnectionType) IsZero() bool {
 
 // The Domain struct corresponds to the data in the GeoIP2 Domain database.
 type Domain struct {
-	Domain string `maxminddb:"domain"`
+	Domain    string        `maxminddb:"domain"`
+	IPAddress netip.Addr    // The IP address used during the lookup
+	Network   netip.Prefix  // The network prefix for this record
 }
 
 var zeroDomain Domain
@@ -271,12 +285,14 @@ func (d Domain) IsZero() bool {
 
 // The ISP struct corresponds to the data in the GeoIP2 ISP database.
 type ISP struct {
-	AutonomousSystemOrganization string `maxminddb:"autonomous_system_organization"`
-	ISP                          string `maxminddb:"isp"`
-	MobileCountryCode            string `maxminddb:"mobile_country_code"`
-	MobileNetworkCode            string `maxminddb:"mobile_network_code"`
-	Organization                 string `maxminddb:"organization"`
-	AutonomousSystemNumber       uint   `maxminddb:"autonomous_system_number"`
+	Network                      netip.Prefix  // The network prefix for this record
+	IPAddress                    netip.Addr    // The IP address used during the lookup
+	AutonomousSystemOrganization string        `maxminddb:"autonomous_system_organization"`
+	ISP                          string        `maxminddb:"isp"`
+	MobileCountryCode            string        `maxminddb:"mobile_country_code"`
+	MobileNetworkCode            string        `maxminddb:"mobile_network_code"`
+	Organization                 string        `maxminddb:"organization"`
+	AutonomousSystemNumber       uint          `maxminddb:"autonomous_system_number"`
 }
 
 var zeroISP ISP
@@ -400,9 +416,17 @@ func (r *Reader) Enterprise(ipAddress netip.Addr) (*Enterprise, error) {
 	if isEnterprise&r.databaseType == 0 {
 		return nil, InvalidMethodError{"Enterprise", r.Metadata().DatabaseType}
 	}
+	result := r.mmdbReader.Lookup(ipAddress)
 	var enterprise Enterprise
-	err := r.mmdbReader.Lookup(ipAddress).Decode(&enterprise)
-	return &enterprise, err
+	err := result.Decode(&enterprise)
+	if err != nil {
+		return &enterprise, err
+	}
+	if result.Found() {
+		enterprise.Traits.IPAddress = ipAddress
+		enterprise.Traits.Network = result.Prefix()
+	}
+	return &enterprise, nil
 }
 
 // City takes an IP address as a netip.Addr and returns a City struct
@@ -412,9 +436,17 @@ func (r *Reader) City(ipAddress netip.Addr) (*City, error) {
 	if isCity&r.databaseType == 0 {
 		return nil, InvalidMethodError{"City", r.Metadata().DatabaseType}
 	}
+	result := r.mmdbReader.Lookup(ipAddress)
 	var city City
-	err := r.mmdbReader.Lookup(ipAddress).Decode(&city)
-	return &city, err
+	err := result.Decode(&city)
+	if err != nil {
+		return &city, err
+	}
+	if result.Found() {
+		city.Traits.IPAddress = ipAddress
+		city.Traits.Network = result.Prefix()
+	}
+	return &city, nil
 }
 
 // Country takes an IP address as a netip.Addr and returns a Country struct
@@ -425,9 +457,17 @@ func (r *Reader) Country(ipAddress netip.Addr) (*Country, error) {
 	if isCountry&r.databaseType == 0 {
 		return nil, InvalidMethodError{"Country", r.Metadata().DatabaseType}
 	}
+	result := r.mmdbReader.Lookup(ipAddress)
 	var country Country
-	err := r.mmdbReader.Lookup(ipAddress).Decode(&country)
-	return &country, err
+	err := result.Decode(&country)
+	if err != nil {
+		return &country, err
+	}
+	if result.Found() {
+		country.Traits.IPAddress = ipAddress
+		country.Traits.Network = result.Prefix()
+	}
+	return &country, nil
 }
 
 // AnonymousIP takes an IP address as a netip.Addr and returns a
@@ -436,9 +476,17 @@ func (r *Reader) AnonymousIP(ipAddress netip.Addr) (*AnonymousIP, error) {
 	if isAnonymousIP&r.databaseType == 0 {
 		return nil, InvalidMethodError{"AnonymousIP", r.Metadata().DatabaseType}
 	}
+	result := r.mmdbReader.Lookup(ipAddress)
 	var anonIP AnonymousIP
-	err := r.mmdbReader.Lookup(ipAddress).Decode(&anonIP)
-	return &anonIP, err
+	err := result.Decode(&anonIP)
+	if err != nil {
+		return &anonIP, err
+	}
+	if result.Found() {
+		anonIP.IPAddress = ipAddress
+		anonIP.Network = result.Prefix()
+	}
+	return &anonIP, nil
 }
 
 // ASN takes an IP address as a netip.Addr and returns a ASN struct and/or
@@ -447,9 +495,17 @@ func (r *Reader) ASN(ipAddress netip.Addr) (*ASN, error) {
 	if isASN&r.databaseType == 0 {
 		return nil, InvalidMethodError{"ASN", r.Metadata().DatabaseType}
 	}
+	result := r.mmdbReader.Lookup(ipAddress)
 	var val ASN
-	err := r.mmdbReader.Lookup(ipAddress).Decode(&val)
-	return &val, err
+	err := result.Decode(&val)
+	if err != nil {
+		return &val, err
+	}
+	if result.Found() {
+		val.IPAddress = ipAddress
+		val.Network = result.Prefix()
+	}
+	return &val, nil
 }
 
 // ConnectionType takes an IP address as a netip.Addr and returns a
@@ -458,9 +514,17 @@ func (r *Reader) ConnectionType(ipAddress netip.Addr) (*ConnectionType, error) {
 	if isConnectionType&r.databaseType == 0 {
 		return nil, InvalidMethodError{"ConnectionType", r.Metadata().DatabaseType}
 	}
+	result := r.mmdbReader.Lookup(ipAddress)
 	var val ConnectionType
-	err := r.mmdbReader.Lookup(ipAddress).Decode(&val)
-	return &val, err
+	err := result.Decode(&val)
+	if err != nil {
+		return &val, err
+	}
+	if result.Found() {
+		val.IPAddress = ipAddress
+		val.Network = result.Prefix()
+	}
+	return &val, nil
 }
 
 // Domain takes an IP address as a netip.Addr and returns a
@@ -469,9 +533,17 @@ func (r *Reader) Domain(ipAddress netip.Addr) (*Domain, error) {
 	if isDomain&r.databaseType == 0 {
 		return nil, InvalidMethodError{"Domain", r.Metadata().DatabaseType}
 	}
+	result := r.mmdbReader.Lookup(ipAddress)
 	var val Domain
-	err := r.mmdbReader.Lookup(ipAddress).Decode(&val)
-	return &val, err
+	err := result.Decode(&val)
+	if err != nil {
+		return &val, err
+	}
+	if result.Found() {
+		val.IPAddress = ipAddress
+		val.Network = result.Prefix()
+	}
+	return &val, nil
 }
 
 // ISP takes an IP address as a netip.Addr and returns a ISP struct and/or
@@ -480,9 +552,17 @@ func (r *Reader) ISP(ipAddress netip.Addr) (*ISP, error) {
 	if isISP&r.databaseType == 0 {
 		return nil, InvalidMethodError{"ISP", r.Metadata().DatabaseType}
 	}
+	result := r.mmdbReader.Lookup(ipAddress)
 	var val ISP
-	err := r.mmdbReader.Lookup(ipAddress).Decode(&val)
-	return &val, err
+	err := result.Decode(&val)
+	if err != nil {
+		return &val, err
+	}
+	if result.Found() {
+		val.IPAddress = ipAddress
+		val.Network = result.Prefix()
+	}
+	return &val, nil
 }
 
 // Metadata takes no arguments and returns a struct containing metadata about
