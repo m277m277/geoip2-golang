@@ -10,6 +10,9 @@
 * **BREAKING CHANGE**: Replaced `map[string]string` Names fields with structured
   `Names` type for significant performance improvements. This eliminates map
   allocation overhead, reducing memory usage by 34% and allocations by 56%.
+* **BREAKING CHANGE**: Added JSON tags to all struct fields. JSON tags match
+  the corresponding `maxminddb` tags where they exist. Custom fields (`IPAddress`
+  and `Network`) use snake_case (`ip_address` and `network`).
 * Added `IsZero()` method to all result structs (City, Country, Enterprise, ASN,
   etc.) to easily check whether any data was found for the queried IP address.
   Requested by Salim Alami. GitHub [#32](https://github.com/oschwald/geoip2-golang/issues/32).
