@@ -1,6 +1,6 @@
 version: "2"
 run:
-  go: "1.23"
+  go: "1.24"
   tests: true
   allow-parallel-runners: true
 linters:
@@ -23,6 +23,8 @@ linters:
     - nlreturn
     - nonamedreturns
     - paralleltest
+    # Seems to conflict with golines or one of the formatters.
+    - tagalign
     - testpackage
     - thelper
     - varnamelen

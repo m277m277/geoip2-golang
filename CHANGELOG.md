@@ -16,6 +16,9 @@
 * **BREAKING CHANGE**: Removed `IsAnonymousProxy` and `IsSatelliteProvider` fields
   from all Traits structs. These fields have been removed from MaxMind databases.
   Use the dedicated Anonymous IP database for anonymity detection instead.
+* **BREAKING CHANGE**: Go 1.24 or greater is now required. This enables the use
+  of `omitzero` in JSON tags to match MaxMind database behavior where empty
+  values are not included.
 * Added `IsZero()` method to all result structs (City, Country, Enterprise, ASN,
   etc.) to easily check whether any data was found for the queried IP address.
   Requested by Salim Alami. GitHub [#32](https://github.com/oschwald/geoip2-golang/issues/32).
