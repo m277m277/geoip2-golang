@@ -7,6 +7,11 @@
   from validation, allowing users to access network topology information even when
   no GeoIP data is found. The Network and IPAddress fields are now always
   populated for all lookups, regardless of whether GeoIP data is available.
+* **BREAKING CHANGE**: Replaced all anonymous nested structs with named types to
+  improve struct initialization ergonomics. All result structs (Enterprise, City,
+  Country) now use named types like `EnterpriseCityRecord`, `CityTraits`,
+  `CountryRecord`, etc. This makes it much easier to initialize structs in user
+  code while maintaining the same JSON serialization behavior.
 
 # 2.0.0-beta.1 - 2025-06-22
 
