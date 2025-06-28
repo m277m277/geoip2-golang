@@ -79,8 +79,8 @@ func TestReader(t *testing.T) {
 	assert.Equal(t, expectedCountryNames, record.Country.Names)
 
 	assert.Equal(t, uint16(100), record.Location.AccuracyRadius)
-	assert.InEpsilon(t, 51.5142, record.Location.Latitude, 1e-10)
-	assert.InEpsilon(t, -0.0931, record.Location.Longitude, 1e-10)
+	assert.InEpsilon(t, 51.5142, *record.Location.Latitude, 1e-10)
+	assert.InEpsilon(t, -0.0931, *record.Location.Longitude, 1e-10)
 	assert.Equal(t, "Europe/London", record.Location.TimeZone)
 
 	assert.Equal(t, uint(6269131), record.Subdivisions[0].GeoNameID)

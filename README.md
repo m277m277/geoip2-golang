@@ -82,7 +82,9 @@ func main() {
 	fmt.Printf("Russian country name: %v\n", record.Country.Names.Russian)
 	fmt.Printf("ISO country code: %v\n", record.Country.ISOCode)
 	fmt.Printf("Time zone: %v\n", record.Location.TimeZone)
-	fmt.Printf("Coordinates: %v, %v\n", record.Location.Latitude, record.Location.Longitude)
+	if record.Location.HasCoordinates() {
+		fmt.Printf("Coordinates: %v, %v\n", *record.Location.Latitude, *record.Location.Longitude)
+	}
 	// Output:
 	// Portuguese (BR) city name: Londres
 	// English subdivision name: England
@@ -161,7 +163,9 @@ func main() {
 	fmt.Printf("Country: %v (%v)\n", record.Country.Names.English, record.Country.ISOCode)
 	fmt.Printf("Continent: %v (%v)\n", record.Continent.Names.English, record.Continent.Code)
 	fmt.Printf("Postal Code: %v\n", record.Postal.Code)
-	fmt.Printf("Location: %v, %v\n", record.Location.Latitude, record.Location.Longitude)
+	if record.Location.HasCoordinates() {
+		fmt.Printf("Location: %v, %v\n", *record.Location.Latitude, *record.Location.Longitude)
+	}
 	fmt.Printf("Time Zone: %v\n", record.Location.TimeZone)
 	fmt.Printf("Network: %v\n", record.Traits.Network)
 	fmt.Printf("IP Address: %v\n", record.Traits.IPAddress)
@@ -353,7 +357,9 @@ func main() {
 	// Basic location information
 	fmt.Printf("City: %v\n", record.City.Names.English)
 	fmt.Printf("Country: %v (%v)\n", record.Country.Names.English, record.Country.ISOCode)
-	fmt.Printf("Location: %v, %v\n", record.Location.Latitude, record.Location.Longitude)
+	if record.Location.HasCoordinates() {
+		fmt.Printf("Location: %v, %v\n", *record.Location.Latitude, *record.Location.Longitude)
+	}
 
 	// Enterprise-specific fields
 	fmt.Printf("ISP: %v\n", record.Traits.ISP)

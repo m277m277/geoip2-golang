@@ -12,6 +12,13 @@
   Country) now use named types like `EnterpriseCityRecord`, `CityTraits`,
   `CountryRecord`, etc. This makes it much easier to initialize structs in user
   code while maintaining the same JSON serialization behavior.
+* **BREAKING CHANGE**: Changed `Location.Latitude` and `Location.Longitude` from
+  `float64` to `*float64` to properly distinguish between missing coordinates and
+  the valid location (0, 0). Missing coordinates are now represented as `nil`
+  and are omitted from JSON output, while valid zero coordinates are preserved.
+  This fixes the ambiguity where (0, 0) was incorrectly treated as "no data".
+  Added `Location.HasCoordinates()` method for safe coordinate access. Reported
+  by Nick Bruun. GitHub #5.
 
 # 2.0.0-beta.1 - 2025-06-22
 

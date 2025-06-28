@@ -62,17 +62,19 @@ func (c Continent) HasData() bool {
 
 // Location contains data for the location record associated with an IP address.
 type Location struct {
+	// Latitude is the approximate latitude of the location associated with
+	// the IP address. This value is not precise and should not be used to
+	// identify a particular address or household. Will be nil if not present
+	// in the database.
+	Latitude *float64 `json:"latitude,omitzero"        maxminddb:"latitude"`
+	// Longitude is the approximate longitude of the location associated with
+	// the IP address. This value is not precise and should not be used to
+	// identify a particular address or household. Will be nil if not present
+	// in the database.
+	Longitude *float64 `json:"longitude,omitzero"       maxminddb:"longitude"`
 	// TimeZone is the time zone associated with location, as specified by
 	// the IANA Time Zone Database (e.g., "America/New_York")
 	TimeZone string `json:"time_zone,omitzero"       maxminddb:"time_zone"`
-	// Latitude is the approximate latitude of the location associated with
-	// the IP address. This value is not precise and should not be used to
-	// identify a particular address or household.
-	Latitude float64 `json:"latitude"                 maxminddb:"latitude"`
-	// Longitude is the approximate longitude of the location associated with
-	// the IP address. This value is not precise and should not be used to
-	// identify a particular address or household.
-	Longitude float64 `json:"longitude"                maxminddb:"longitude"`
 	// MetroCode is a metro code for targeting advertisements.
 	//
 	// Deprecated: Metro codes are no longer maintained and should not be used.
@@ -87,6 +89,11 @@ type Location struct {
 // HasData returns true if the Location has any data.
 func (l Location) HasData() bool {
 	return l != zeroLocation
+}
+
+// HasCoordinates returns true if both latitude and longitude are present.
+func (l Location) HasCoordinates() bool {
+	return l.Latitude != nil && l.Longitude != nil
 }
 
 // RepresentedCountry contains data for the represented country associated
@@ -342,15 +349,13 @@ type Enterprise struct {
 	// Continent contains data for the continent record associated with the IP
 	// address.
 	Continent Continent `json:"continent,omitzero"           maxminddb:"continent"`
-	// City contains data for the city record associated with the IP address.
-	City EnterpriseCityRecord `json:"city,omitzero"                maxminddb:"city"`
-	// Postal contains data for the postal record associated with the IP address.
-	Postal EnterprisePostal `json:"postal,omitzero"              maxminddb:"postal"`
 	// Subdivisions contains data for the subdivisions associated with the IP
 	// address. The subdivisions array is ordered from largest to smallest. For
 	// instance, the response for Oxford in the United Kingdom would have England
 	// as the first element and Oxfordshire as the second element.
 	Subdivisions []EnterpriseSubdivision `json:"subdivisions,omitzero"        maxminddb:"subdivisions"`
+	// Postal contains data for the postal record associated with the IP address.
+	Postal EnterprisePostal `json:"postal,omitzero"              maxminddb:"postal"`
 	// RepresentedCountry contains data for the represented country associated
 	// with the IP address. The represented country is the country represented
 	// by something like a military base or embassy.
@@ -363,11 +368,13 @@ type Enterprise struct {
 	// with the IP address. This record represents the country where the ISP has
 	// registered the IP block and may differ from the user's country.
 	RegisteredCountry CountryRecord `json:"registered_country,omitzero"  maxminddb:"registered_country"`
-	// Traits contains various traits associated with the IP address
-	Traits EnterpriseTraits `json:"traits,omitzero"              maxminddb:"traits"`
+	// City contains data for the city record associated with the IP address.
+	City EnterpriseCityRecord `json:"city,omitzero"                maxminddb:"city"`
 	// Location contains data for the location record associated with the IP
 	// address
 	Location Location `json:"location,omitzero"            maxminddb:"location"`
+	// Traits contains various traits associated with the IP address
+	Traits EnterpriseTraits `json:"traits,omitzero"              maxminddb:"traits"`
 }
 
 // HasData returns true if any GeoIP data was found for the IP in the Enterprise database.

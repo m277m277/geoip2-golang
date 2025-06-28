@@ -28,7 +28,11 @@ func Example() {
 	fmt.Printf("Russian country name: %v\n", record.Country.Names.Russian)
 	fmt.Printf("ISO country code: %v\n", record.Country.ISOCode)
 	fmt.Printf("Time zone: %v\n", record.Location.TimeZone)
-	fmt.Printf("Coordinates: %v, %v\n", record.Location.Latitude, record.Location.Longitude)
+	if record.Location.HasCoordinates() {
+		fmt.Printf("Coordinates: %v, %v\n", *record.Location.Latitude, *record.Location.Longitude)
+	} else {
+		fmt.Println("Coordinates: unavailable")
+	}
 	// Output:
 	// Portuguese (BR) city name: Londres
 	// English subdivision name: England
