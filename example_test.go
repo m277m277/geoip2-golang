@@ -55,7 +55,7 @@ func ExampleReader_City() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -86,7 +86,7 @@ func ExampleReader_Country() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -115,7 +115,7 @@ func ExampleReader_ASN() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -144,7 +144,7 @@ func ExampleReader_AnonymousIP() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -175,7 +175,7 @@ func ExampleReader_Enterprise() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -208,7 +208,7 @@ func ExampleReader_ISP() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -239,7 +239,7 @@ func ExampleReader_Domain() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -266,7 +266,7 @@ func ExampleReader_ConnectionType() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}

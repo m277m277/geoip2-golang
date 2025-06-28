@@ -1,3 +1,13 @@
+# 2.0.0-beta.2
+
+* **BREAKING CHANGE**: Replaced `IsZero()` methods with `HasData()` methods on all
+  result structs (including Names). The new methods provide clearer semantics:
+  `HasData()` returns `true` when GeoIP data is found and `false` when no data is
+  available. Unlike `IsZero()`, `HasData()` excludes Network and IPAddress fields
+  from validation, allowing users to access network topology information even when
+  no GeoIP data is found. The Network and IPAddress fields are now always
+  populated for all lookups, regardless of whether GeoIP data is available.
+
 # 2.0.0-beta.1 - 2025-06-22
 
 * **BREAKING CHANGE**: Updated to use `maxminddb-golang/v2` which provides

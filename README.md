@@ -11,7 +11,7 @@ This library is built using
 data for the database record is decoded using this library. Version 2.0
 provides significant performance improvements with 56% fewer allocations and
 34% less memory usage compared to v1. Version 2.0 also adds `Network` and
-`IPAddress` fields to all result structs, and includes an `IsZero()` method to
+`IPAddress` fields to all result structs, and includes a `HasData()` method to
 easily check if data was found. If you only need several fields, you may get
 superior performance by using maxminddb's `Lookup` directly with a result
 struct that only contains the required fields. (See
@@ -32,7 +32,7 @@ Version 2.0 includes several major improvements:
 - **Modern API**: Uses `netip.Addr` instead of `net.IP` for better performance
 - **Network Information**: All result structs now include `Network` and
   `IPAddress` fields
-- **Data Validation**: New `IsZero()` method to easily check if data was found
+- **Data Validation**: New `HasData()` method to easily check if data was found
 - **Structured Names**: Replaced `map[string]string` with typed `Names` struct
   for better performance
 - **Go 1.24 Support**: Uses `omitzero` JSON tags to match MaxMind database
@@ -71,7 +71,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -151,7 +151,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -200,7 +200,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -251,7 +251,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -296,7 +296,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -345,7 +345,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -410,7 +410,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -464,7 +464,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -507,7 +507,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -551,7 +551,7 @@ func main() {
 	}
 
 	// Always check if data was found
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP address")
 		return
 	}
@@ -627,7 +627,7 @@ fmt.Println(string(jsonData))
 - **IP Type**: Use `netip.Addr` instead of `net.IP`
 - **Field Names**: `IsoCode` → `ISOCode`
 - **Names Access**: Use struct fields instead of map access
-- **Data Validation**: Use `IsZero()` method to check for data availability
+- **Data Validation**: Use `HasData()` method to check for data availability
 
 ### Migration Example
 
@@ -647,7 +647,7 @@ if err != nil {
     // handle error
 }
 record, err := db.City(ip)
-if record.IsZero() {
+if !record.HasData() {
     // handle no data found
 }
 cityName := record.City.Names.English
@@ -659,7 +659,7 @@ cityName := record.City.Names.English
 
 **Database not found**: Ensure the .mmdb file path is correct and readable.
 
-**No data returned**: Check if `IsZero()` returns true - the IP may not be in
+**No data returned**: Check if `HasData()` returns false - the IP may not be in
 the database or may be a private/reserved IP.
 
 **Performance issues**: Ensure you're reusing the database instance rather than

@@ -343,31 +343,88 @@ func TestIsZero(t *testing.T) {
 	ipWithData := netip.MustParseAddr("81.2.69.160")
 	record, err := reader.City(ipWithData)
 	require.NoError(t, err)
-	assert.False(t, record.IsZero(), "Record with data should not be zero")
+	assert.True(t, record.HasData(), "Record with data should have data")
 
 	// Test with an IP that has no data (private IP)
 	ipWithoutData := netip.MustParseAddr("192.168.1.1")
 	emptyRecord, err := reader.City(ipWithoutData)
 	require.NoError(t, err)
-	assert.True(t, emptyRecord.IsZero(), "Record without data should be zero")
+	assert.False(t, emptyRecord.HasData(), "Record without data should not have data")
 
-	// Test Names IsZero
+	// Verify IPAddress and Network are always set, even when no data is found
+	assert.Equal(
+		t,
+		ipWithData,
+		record.Traits.IPAddress,
+		"IPAddress should be set for records with data",
+	)
+	assert.NotEqual(
+		t,
+		netip.Prefix{},
+		record.Traits.Network,
+		"Network should be set for records with data",
+	)
+	assert.Equal(
+		t,
+		ipWithoutData,
+		emptyRecord.Traits.IPAddress,
+		"IPAddress should be set even when no data found",
+	)
+	assert.NotEqual(
+		t,
+		netip.Prefix{},
+		emptyRecord.Traits.Network,
+		"Network should be set even when no data found",
+	)
+
+	// Test Names HasData
 	var emptyNames Names
-	assert.True(t, emptyNames.IsZero(), "Empty Names should be zero")
+	assert.False(t, emptyNames.HasData(), "Empty Names should not have data")
 
 	nonEmptyNames := Names{English: "Test"}
-	assert.False(t, nonEmptyNames.IsZero(), "Names with data should not be zero")
+	assert.True(t, nonEmptyNames.HasData(), "Names with data should have data")
 
 	// Test other struct types
 	var emptyASN ASN
-	assert.True(t, emptyASN.IsZero(), "Empty ASN should be zero")
+	assert.False(t, emptyASN.HasData(), "Empty ASN should not have data")
 
 	nonEmptyASN := ASN{AutonomousSystemNumber: 123}
-	assert.False(t, nonEmptyASN.IsZero(), "ASN with data should not be zero")
+	assert.True(t, nonEmptyASN.HasData(), "ASN with data should have data")
 }
 
-func TestAllStructsHaveIsZero(t *testing.T) {
-	// Ensure all result structs have IsZero methods
+func TestIPAddressAndNetworkAlwaysSet(t *testing.T) {
+	// Test that IPAddress and Network are always set for ASN lookups
+	asnReader, err := Open("test-data/test-data/GeoLite2-ASN-Test.mmdb")
+	require.NoError(t, err)
+	defer asnReader.Close()
+
+	// Test with an IP that has ASN data
+	ipWithData := netip.MustParseAddr("1.128.0.0")
+	asnRecord, err := asnReader.ASN(ipWithData)
+	require.NoError(t, err)
+	assert.Equal(t, ipWithData, asnRecord.IPAddress, "ASN IPAddress should be set")
+	assert.NotEqual(t, netip.Prefix{}, asnRecord.Network, "ASN Network should be set")
+
+	// Test with an IP that has no ASN data (private IP)
+	ipWithoutData := netip.MustParseAddr("192.168.1.1")
+	asnEmptyRecord, err := asnReader.ASN(ipWithoutData)
+	require.NoError(t, err)
+	assert.Equal(
+		t,
+		ipWithoutData,
+		asnEmptyRecord.IPAddress,
+		"ASN IPAddress should be set even when no data found",
+	)
+	assert.NotEqual(
+		t,
+		netip.Prefix{},
+		asnEmptyRecord.Network,
+		"ASN Network should be set even when no data found",
+	)
+}
+
+func TestAllStructsHaveHasData(t *testing.T) {
+	// Ensure all result structs have HasData methods
 	var city City
 	var country Country
 	var enterprise Enterprise
@@ -378,14 +435,14 @@ func TestAllStructsHaveIsZero(t *testing.T) {
 	var isp ISP
 	var names Names
 
-	// These should all compile and return true for zero values
-	assert.True(t, city.IsZero())
-	assert.True(t, country.IsZero())
-	assert.True(t, enterprise.IsZero())
-	assert.True(t, anonymousIP.IsZero())
-	assert.True(t, asn.IsZero())
-	assert.True(t, connectionType.IsZero())
-	assert.True(t, domain.IsZero())
-	assert.True(t, isp.IsZero())
-	assert.True(t, names.IsZero())
+	// These should all compile and return false for zero values (no data)
+	assert.False(t, city.HasData())
+	assert.False(t, country.HasData())
+	assert.False(t, enterprise.HasData())
+	assert.False(t, anonymousIP.HasData())
+	assert.False(t, asn.HasData())
+	assert.False(t, connectionType.HasData())
+	assert.False(t, domain.HasData())
+	assert.False(t, isp.HasData())
+	assert.False(t, names.HasData())
 }

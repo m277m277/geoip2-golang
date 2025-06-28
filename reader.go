@@ -19,7 +19,7 @@
 //		log.Fatal(err)
 //	}
 //
-//	if record.IsZero() {
+//	if !record.HasData() {
 //		fmt.Println("No data found for this IP")
 //		return
 //	}
@@ -44,7 +44,7 @@
 // Version 2.0 introduces significant improvements:
 //   - Modern API using netip.Addr instead of net.IP
 //   - Network and IPAddress fields in all result structs
-//   - IsZero() method for data validation
+//   - HasData() method for data validation
 //   - Structured Names type for localized names
 //   - JSON serialization support
 //
@@ -54,7 +54,6 @@ package geoip2
 import (
 	"fmt"
 	"net/netip"
-	"reflect"
 
 	"github.com/oschwald/maxminddb-golang/v2"
 )
@@ -81,9 +80,9 @@ type Names struct {
 
 var zeroNames Names
 
-// IsZero returns true if the Names struct has no localized names.
-func (n Names) IsZero() bool {
-	return n == zeroNames
+// HasData returns true if the Names struct has any localized names.
+func (n Names) HasData() bool {
+	return n != zeroNames
 }
 
 // The Enterprise struct corresponds to the data in the GeoIP2 Enterprise
@@ -263,11 +262,65 @@ type Enterprise struct {
 	} `json:"location,omitzero"            maxminddb:"location"`
 }
 
-var zeroEnterprise Enterprise
+// HasData returns true if any GeoIP data was found for the IP in the Enterprise database.
+// This excludes the Network and IPAddress fields which are always populated for found IPs.
+func (e Enterprise) HasData() bool {
+	return e.hasContinentData() || e.hasCityData() || e.hasPostalData() ||
+		e.hasSubdivisionsData() || e.hasRepresentedCountryData() ||
+		e.hasCountryData() || e.hasRegisteredCountryData() ||
+		e.hasTraitsData() || e.hasLocationData()
+}
 
-// IsZero returns true if no data was found for the IP in the Enterprise database.
-func (e Enterprise) IsZero() bool {
-	return reflect.DeepEqual(e, zeroEnterprise)
+func (e Enterprise) hasContinentData() bool {
+	return e.Continent.Names.HasData() || e.Continent.Code != "" || e.Continent.GeoNameID != 0
+}
+
+func (e Enterprise) hasCityData() bool {
+	return e.City.Names.HasData() || e.City.GeoNameID != 0 || e.City.Confidence != 0
+}
+
+func (e Enterprise) hasPostalData() bool {
+	return e.Postal.Code != "" || e.Postal.Confidence != 0
+}
+
+func (e Enterprise) hasSubdivisionsData() bool {
+	for _, sub := range e.Subdivisions {
+		if sub.Names.HasData() || sub.ISOCode != "" || sub.GeoNameID != 0 || sub.Confidence != 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func (e Enterprise) hasRepresentedCountryData() bool {
+	return e.RepresentedCountry.Names.HasData() || e.RepresentedCountry.ISOCode != "" ||
+		e.RepresentedCountry.Type != "" || e.RepresentedCountry.GeoNameID != 0 ||
+		e.RepresentedCountry.IsInEuropeanUnion
+}
+
+func (e Enterprise) hasCountryData() bool {
+	return e.Country.Names.HasData() || e.Country.ISOCode != "" || e.Country.GeoNameID != 0 ||
+		e.Country.Confidence != 0 || e.Country.IsInEuropeanUnion
+}
+
+func (e Enterprise) hasRegisteredCountryData() bool {
+	return e.RegisteredCountry.Names.HasData() || e.RegisteredCountry.ISOCode != "" ||
+		e.RegisteredCountry.GeoNameID != 0 || e.RegisteredCountry.Confidence != 0 ||
+		e.RegisteredCountry.IsInEuropeanUnion
+}
+
+func (e Enterprise) hasTraitsData() bool {
+	return e.Traits.AutonomousSystemOrganization != "" || e.Traits.ConnectionType != "" ||
+		e.Traits.Domain != "" || e.Traits.ISP != "" || e.Traits.MobileCountryCode != "" ||
+		e.Traits.MobileNetworkCode != "" || e.Traits.Organization != "" ||
+		e.Traits.UserType != "" || e.Traits.StaticIPScore != 0 ||
+		e.Traits.AutonomousSystemNumber != 0 || e.Traits.IsAnycast ||
+		e.Traits.IsLegitimateProxy
+}
+
+func (e Enterprise) hasLocationData() bool {
+	return e.Location.TimeZone != "" || e.Location.Latitude != 0 || e.Location.Longitude != 0 ||
+		e.Location.MetroCode != 0 || e.Location.AccuracyRadius != 0
 }
 
 // The City struct corresponds to the data in the GeoIP2/GeoLite2 City
@@ -394,11 +447,58 @@ type City struct {
 	} `json:"location,omitzero"            maxminddb:"location"`
 }
 
-var zeroCity City
+// HasData returns true if any GeoIP data was found for the IP in the City database.
+// This excludes the Network and IPAddress fields which are always populated for found IPs.
+func (c City) HasData() bool {
+	return c.hasTraitsData() || c.hasPostalData() || c.hasContinentData() ||
+		c.hasCityData() || c.hasSubdivisionsData() || c.hasRepresentedCountryData() ||
+		c.hasCountryData() || c.hasRegisteredCountryData() || c.hasLocationData()
+}
 
-// IsZero returns true if no data was found for the IP in the City database.
-func (c City) IsZero() bool {
-	return reflect.DeepEqual(c, zeroCity)
+func (c City) hasTraitsData() bool {
+	return c.Traits.IsAnycast
+}
+
+func (c City) hasPostalData() bool {
+	return c.Postal.Code != ""
+}
+
+func (c City) hasContinentData() bool {
+	return c.Continent.Names.HasData() || c.Continent.Code != "" || c.Continent.GeoNameID != 0
+}
+
+func (c City) hasCityData() bool {
+	return c.City.Names.HasData() || c.City.GeoNameID != 0
+}
+
+func (c City) hasSubdivisionsData() bool {
+	for _, sub := range c.Subdivisions {
+		if sub.Names.HasData() || sub.ISOCode != "" || sub.GeoNameID != 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func (c City) hasRepresentedCountryData() bool {
+	return c.RepresentedCountry.Names.HasData() || c.RepresentedCountry.ISOCode != "" ||
+		c.RepresentedCountry.Type != "" || c.RepresentedCountry.GeoNameID != 0 ||
+		c.RepresentedCountry.IsInEuropeanUnion
+}
+
+func (c City) hasCountryData() bool {
+	return c.Country.Names.HasData() || c.Country.ISOCode != "" || c.Country.GeoNameID != 0 ||
+		c.Country.IsInEuropeanUnion
+}
+
+func (c City) hasRegisteredCountryData() bool {
+	return c.RegisteredCountry.Names.HasData() || c.RegisteredCountry.ISOCode != "" ||
+		c.RegisteredCountry.GeoNameID != 0 || c.RegisteredCountry.IsInEuropeanUnion
+}
+
+func (c City) hasLocationData() bool {
+	return c.Location.TimeZone != "" || c.Location.Latitude != 0 || c.Location.Longitude != 0 ||
+		c.Location.MetroCode != 0 || c.Location.AccuracyRadius != 0
 }
 
 // The Country struct corresponds to the data in the GeoIP2/GeoLite2
@@ -475,11 +575,18 @@ type Country struct {
 	} `json:"registered_country,omitzero"  maxminddb:"registered_country"`
 }
 
-var zeroCountry Country
-
-// IsZero returns true if no data was found for the IP in the Country database.
-func (c Country) IsZero() bool {
-	return c == zeroCountry
+// HasData returns true if any GeoIP data was found for the IP in the Country database.
+// This excludes the Network and IPAddress fields which are always populated for found IPs.
+func (c Country) HasData() bool {
+	return c.Continent.Names.HasData() || c.Continent.Code != "" || c.Continent.GeoNameID != 0 ||
+		c.RepresentedCountry.Names.HasData() || c.RepresentedCountry.ISOCode != "" ||
+		c.RepresentedCountry.Type != "" || c.RepresentedCountry.GeoNameID != 0 ||
+		c.RepresentedCountry.IsInEuropeanUnion ||
+		c.Country.Names.HasData() || c.Country.ISOCode != "" || c.Country.GeoNameID != 0 ||
+		c.Country.IsInEuropeanUnion ||
+		c.RegisteredCountry.Names.HasData() || c.RegisteredCountry.ISOCode != "" ||
+		c.RegisteredCountry.GeoNameID != 0 || c.RegisteredCountry.IsInEuropeanUnion ||
+		c.Traits.IsAnycast
 }
 
 // The AnonymousIP struct corresponds to the data in the GeoIP2
@@ -509,11 +616,11 @@ type AnonymousIP struct {
 	IsTorExitNode bool `json:"is_tor_exit_node,omitzero"     maxminddb:"is_tor_exit_node"`
 }
 
-var zeroAnonymousIP AnonymousIP
-
-// IsZero returns true if no data was found for the IP in the AnonymousIP database.
-func (a AnonymousIP) IsZero() bool {
-	return a == zeroAnonymousIP
+// HasData returns true if any data was found for the IP in the AnonymousIP database.
+// This excludes the Network and IPAddress fields which are always populated for found IPs.
+func (a AnonymousIP) HasData() bool {
+	return a.IsAnonymous || a.IsAnonymousVPN || a.IsHostingProvider ||
+		a.IsPublicProxy || a.IsResidentialProxy || a.IsTorExitNode
 }
 
 // The ASN struct corresponds to the data in the GeoLite2 ASN database.
@@ -529,11 +636,10 @@ type ASN struct {
 	AutonomousSystemNumber uint `json:"autonomous_system_number,omitzero"       maxminddb:"autonomous_system_number"` //nolint:lll
 }
 
-var zeroASN ASN
-
-// IsZero returns true if no data was found for the IP in the ASN database.
-func (a ASN) IsZero() bool {
-	return a == zeroASN
+// HasData returns true if any data was found for the IP in the ASN database.
+// This excludes the Network and IPAddress fields which are always populated for found IPs.
+func (a ASN) HasData() bool {
+	return a.AutonomousSystemNumber != 0 || a.AutonomousSystemOrganization != ""
 }
 
 // The ConnectionType struct corresponds to the data in the GeoIP2
@@ -550,11 +656,10 @@ type ConnectionType struct {
 	Network netip.Prefix `json:"network,omitzero"`
 }
 
-var zeroConnectionType ConnectionType
-
-// IsZero returns true if no data was found for the IP in the ConnectionType database.
-func (c ConnectionType) IsZero() bool {
-	return c == zeroConnectionType
+// HasData returns true if any data was found for the IP in the ConnectionType database.
+// This excludes the Network and IPAddress fields which are always populated for found IPs.
+func (c ConnectionType) HasData() bool {
+	return c.ConnectionType != ""
 }
 
 // The Domain struct corresponds to the data in the GeoIP2 Domain database.
@@ -569,11 +674,10 @@ type Domain struct {
 	Network netip.Prefix `json:"network,omitzero"`
 }
 
-var zeroDomain Domain
-
-// IsZero returns true if no data was found for the IP in the Domain database.
-func (d Domain) IsZero() bool {
-	return d == zeroDomain
+// HasData returns true if any data was found for the IP in the Domain database.
+// This excludes the Network and IPAddress fields which are always populated for found IPs.
+func (d Domain) HasData() bool {
+	return d.Domain != ""
 }
 
 // The ISP struct corresponds to the data in the GeoIP2 ISP database.
@@ -599,11 +703,12 @@ type ISP struct {
 	AutonomousSystemNumber uint `json:"autonomous_system_number,omitzero"       maxminddb:"autonomous_system_number"`
 }
 
-var zeroISP ISP
-
-// IsZero returns true if no data was found for the IP in the ISP database.
-func (i ISP) IsZero() bool {
-	return i == zeroISP
+// HasData returns true if any data was found for the IP in the ISP database.
+// This excludes the Network and IPAddress fields which are always populated for found IPs.
+func (i ISP) HasData() bool {
+	return i.AutonomousSystemOrganization != "" || i.ISP != "" ||
+		i.MobileCountryCode != "" || i.MobileNetworkCode != "" ||
+		i.Organization != "" || i.AutonomousSystemNumber != 0
 }
 
 type databaseType int
@@ -726,10 +831,8 @@ func (r *Reader) Enterprise(ipAddress netip.Addr) (*Enterprise, error) {
 	if err != nil {
 		return &enterprise, err
 	}
-	if result.Found() {
-		enterprise.Traits.IPAddress = ipAddress
-		enterprise.Traits.Network = result.Prefix()
-	}
+	enterprise.Traits.IPAddress = ipAddress
+	enterprise.Traits.Network = result.Prefix()
 	return &enterprise, nil
 }
 
@@ -746,10 +849,8 @@ func (r *Reader) City(ipAddress netip.Addr) (*City, error) {
 	if err != nil {
 		return &city, err
 	}
-	if result.Found() {
-		city.Traits.IPAddress = ipAddress
-		city.Traits.Network = result.Prefix()
-	}
+	city.Traits.IPAddress = ipAddress
+	city.Traits.Network = result.Prefix()
 	return &city, nil
 }
 
@@ -767,10 +868,8 @@ func (r *Reader) Country(ipAddress netip.Addr) (*Country, error) {
 	if err != nil {
 		return &country, err
 	}
-	if result.Found() {
-		country.Traits.IPAddress = ipAddress
-		country.Traits.Network = result.Prefix()
-	}
+	country.Traits.IPAddress = ipAddress
+	country.Traits.Network = result.Prefix()
 	return &country, nil
 }
 
@@ -786,10 +885,8 @@ func (r *Reader) AnonymousIP(ipAddress netip.Addr) (*AnonymousIP, error) {
 	if err != nil {
 		return &anonIP, err
 	}
-	if result.Found() {
-		anonIP.IPAddress = ipAddress
-		anonIP.Network = result.Prefix()
-	}
+	anonIP.IPAddress = ipAddress
+	anonIP.Network = result.Prefix()
 	return &anonIP, nil
 }
 
@@ -805,10 +902,8 @@ func (r *Reader) ASN(ipAddress netip.Addr) (*ASN, error) {
 	if err != nil {
 		return &val, err
 	}
-	if result.Found() {
-		val.IPAddress = ipAddress
-		val.Network = result.Prefix()
-	}
+	val.IPAddress = ipAddress
+	val.Network = result.Prefix()
 	return &val, nil
 }
 
@@ -824,10 +919,8 @@ func (r *Reader) ConnectionType(ipAddress netip.Addr) (*ConnectionType, error) {
 	if err != nil {
 		return &val, err
 	}
-	if result.Found() {
-		val.IPAddress = ipAddress
-		val.Network = result.Prefix()
-	}
+	val.IPAddress = ipAddress
+	val.Network = result.Prefix()
 	return &val, nil
 }
 
@@ -843,10 +936,8 @@ func (r *Reader) Domain(ipAddress netip.Addr) (*Domain, error) {
 	if err != nil {
 		return &val, err
 	}
-	if result.Found() {
-		val.IPAddress = ipAddress
-		val.Network = result.Prefix()
-	}
+	val.IPAddress = ipAddress
+	val.Network = result.Prefix()
 	return &val, nil
 }
 
@@ -862,10 +953,8 @@ func (r *Reader) ISP(ipAddress netip.Addr) (*ISP, error) {
 	if err != nil {
 		return &val, err
 	}
-	if result.Found() {
-		val.IPAddress = ipAddress
-		val.Network = result.Prefix()
-	}
+	val.IPAddress = ipAddress
+	val.Network = result.Prefix()
 	return &val, nil
 }
 
