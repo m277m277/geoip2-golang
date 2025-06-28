@@ -28,7 +28,11 @@ func Example() {
 	fmt.Printf("Russian country name: %v\n", record.Country.Names.Russian)
 	fmt.Printf("ISO country code: %v\n", record.Country.ISOCode)
 	fmt.Printf("Time zone: %v\n", record.Location.TimeZone)
-	fmt.Printf("Coordinates: %v, %v\n", record.Location.Latitude, record.Location.Longitude)
+	if record.Location.HasCoordinates() {
+		fmt.Printf("Coordinates: %v, %v\n", *record.Location.Latitude, *record.Location.Longitude)
+	} else {
+		fmt.Println("Coordinates: unavailable")
+	}
 	// Output:
 	// Portuguese (BR) city name: Londres
 	// English subdivision name: England
@@ -55,7 +59,7 @@ func ExampleReader_City() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -86,7 +90,7 @@ func ExampleReader_Country() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -115,7 +119,7 @@ func ExampleReader_ASN() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -144,7 +148,7 @@ func ExampleReader_AnonymousIP() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -175,7 +179,7 @@ func ExampleReader_Enterprise() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -208,7 +212,7 @@ func ExampleReader_ISP() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -239,7 +243,7 @@ func ExampleReader_Domain() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}
@@ -266,7 +270,7 @@ func ExampleReader_ConnectionType() {
 		log.Panic(err)
 	}
 
-	if record.IsZero() {
+	if !record.HasData() {
 		fmt.Println("No data found for this IP")
 		return
 	}

@@ -1,3 +1,25 @@
+# 2.0.0-beta.2
+
+* **BREAKING CHANGE**: Replaced `IsZero()` methods with `HasData()` methods on all
+  result structs (including Names). The new methods provide clearer semantics:
+  `HasData()` returns `true` when GeoIP data is found and `false` when no data is
+  available. Unlike `IsZero()`, `HasData()` excludes Network and IPAddress fields
+  from validation, allowing users to access network topology information even when
+  no GeoIP data is found. The Network and IPAddress fields are now always
+  populated for all lookups, regardless of whether GeoIP data is available.
+* **BREAKING CHANGE**: Replaced all anonymous nested structs with named types to
+  improve struct initialization ergonomics. All result structs (Enterprise, City,
+  Country) now use named types like `EnterpriseCityRecord`, `CityTraits`,
+  `CountryRecord`, etc. This makes it much easier to initialize structs in user
+  code while maintaining the same JSON serialization behavior.
+* **BREAKING CHANGE**: Changed `Location.Latitude` and `Location.Longitude` from
+  `float64` to `*float64` to properly distinguish between missing coordinates and
+  the valid location (0, 0). Missing coordinates are now represented as `nil`
+  and are omitted from JSON output, while valid zero coordinates are preserved.
+  This fixes the ambiguity where (0, 0) was incorrectly treated as "no data".
+  Added `Location.HasCoordinates()` method for safe coordinate access. Reported
+  by Nick Bruun. GitHub #5.
+
 # 2.0.0-beta.1 - 2025-06-22
 
 * **BREAKING CHANGE**: Updated to use `maxminddb-golang/v2` which provides
