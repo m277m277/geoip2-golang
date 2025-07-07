@@ -1,5 +1,7 @@
 # 2.0.0-beta.3
 
+* Add support for `GeoIP-City-Redacted-US` and `GeoIP-Enterprise-Redacted-US`.
+  Requested by Tom Anderson. GitHub #134.
 * Upgrade `github.com/oschwald/maxminddb-golang/v2` to `v2.0.0-beta.7`.
 
 # 2.0.0-beta.2
