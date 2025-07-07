@@ -2,6 +2,10 @@ module github.com/oschwald/geoip2-golang/v2
 
 go 1.24
 
+retract (
+	v1.12.0 // pointed to v2 changes
+)
+
 require (
 	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.7
 	github.com/stretchr/testify v1.10.0
