@@ -1,10 +1,10 @@
-# 2.0.0-beta.3
+# 2.0.0-beta.3 - 2025-07-07
 
 * Add support for `GeoIP-City-Redacted-US` and `GeoIP-Enterprise-Redacted-US`.
   Requested by Tom Anderson. GitHub #134.
 * Upgrade `github.com/oschwald/maxminddb-golang/v2` to `v2.0.0-beta.7`.
 
-# 2.0.0-beta.2
+# 2.0.0-beta.2 - 2025-06-28
 
 * **BREAKING CHANGE**: Replaced `IsZero()` methods with `HasData()` methods on all
   result structs (including Names). The new methods provide clearer semantics:
