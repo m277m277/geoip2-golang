@@ -1,3 +1,7 @@
+# 2.0.0-beta.3
+
+* Upgrade `github.com/oschwald/maxminddb-golang/v2` to `v2.0.0-beta.7`.
+
 # 2.0.0-beta.2
 
 * **BREAKING CHANGE**: Replaced `IsZero()` methods with `HasData()` methods on all
