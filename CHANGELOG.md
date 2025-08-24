@@ -1,3 +1,10 @@
+# 2.0.0-beta.4
+
+* Updated maxminddb dependency to v2.0.0-beta.9.
+* Added `OpenBytes` method to match the API changes in maxminddb v2.0.0-beta.9.
+* Deprecated `FromBytes` method. Use `OpenBytes` instead. `FromBytes` will be
+  removed in a future version.
+
 # 2.0.0-beta.3 - 2025-07-07
 
 * Add support for `GeoIP-City-Redacted-US` and `GeoIP-Enterprise-Redacted-US`.

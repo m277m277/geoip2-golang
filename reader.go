@@ -72,7 +72,7 @@ const (
 )
 
 // Reader holds the maxminddb.Reader struct. It can be created using the
-// Open and FromBytes functions.
+// Open and OpenBytes functions.
 type Reader struct {
 	mmdbReader   *maxminddb.Reader
 	databaseType databaseType
@@ -114,17 +114,28 @@ func Open(file string) (*Reader, error) {
 	return &Reader{reader, dbType}, err
 }
 
-// FromBytes takes a byte slice corresponding to a GeoIP2/GeoLite2 database
+// OpenBytes takes a byte slice corresponding to a GeoIP2/GeoLite2 database
 // file and returns a Reader struct or an error. Note that the byte slice is
 // used directly; any modification of it after opening the database will result
 // in errors while reading from the database.
-func FromBytes(bytes []byte) (*Reader, error) {
-	reader, err := maxminddb.FromBytes(bytes)
+func OpenBytes(bytes []byte) (*Reader, error) {
+	reader, err := maxminddb.OpenBytes(bytes)
 	if err != nil {
 		return nil, err
 	}
 	dbType, err := getDBType(reader)
 	return &Reader{reader, dbType}, err
+}
+
+// FromBytes takes a byte slice corresponding to a GeoIP2/GeoLite2 database
+// file and returns a Reader struct or an error. Note that the byte slice is
+// used directly; any modification of it after opening the database will result
+// in errors while reading from the database.
+//
+// Deprecated: Use OpenBytes instead. FromBytes will be removed in a future
+// version.
+func FromBytes(bytes []byte) (*Reader, error) {
+	return OpenBytes(bytes)
 }
 
 func getDBType(reader *maxminddb.Reader) (databaseType, error) {
