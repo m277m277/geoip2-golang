@@ -3,7 +3,7 @@ module github.com/oschwald/geoip2-golang/v2
 go 1.24
 
 require (
-	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.9
+	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.10
 	github.com/stretchr/testify v1.10.0
 )
 
